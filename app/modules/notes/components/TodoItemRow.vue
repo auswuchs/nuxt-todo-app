@@ -73,6 +73,7 @@ onBeforeUnmount(() => {
       class="todo-row__remove"
       label="Удалить пункт"
       variant="danger"
+      size="sm"
       @click="emit('remove', todo.id)"
     >
       <svg
@@ -105,7 +106,7 @@ onBeforeUnmount(() => {
 
   &__checkbox {
     flex: none;
-    margin-top: 0.4rem;
+    margin-top: 0.4375rem;
   }
 
   &__text {
@@ -145,7 +146,7 @@ onBeforeUnmount(() => {
   }
 
   &__remove {
-    margin-top: 0.0625rem;
+    margin-top: -0.0625rem;
     opacity: 0.55;
     transition: opacity $transition-fast;
   }
@@ -160,6 +161,7 @@ onBeforeUnmount(() => {
     padding-inline: 0;
 
     &__remove {
+      margin-top: -0.3125rem;
       opacity: 1;
     }
   }

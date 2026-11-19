@@ -55,15 +55,17 @@ const { notes, isEmpty, countLabel, createNote, deleteNote } = useNotes()
       v-else
       class="catalog__empty"
     >
-      <h2 class="catalog__empty-title">
-        Пока нет заметок
-      </h2>
-      <p class="catalog__empty-text">
-        Создайте первую — она появится здесь вместе со списком пунктов.
-      </p>
-      <AppButton @click="createNote">
-        Создать первую заметку
-      </AppButton>
+      <div class="catalog__empty-copy">
+        <h2 class="catalog__empty-title">
+          Пока нет заметок
+        </h2>
+        <p class="catalog__empty-text">
+          Создайте первую — она появится здесь вместе со списком пунктов.
+        </p>
+        <AppButton @click="createNote">
+          Создать первую заметку
+        </AppButton>
+      </div>
     </section>
   </div>
 </template>
@@ -112,13 +114,16 @@ const { notes, isEmpty, countLabel, createNote, deleteNote } = useNotes()
   }
 
   &__empty {
-    max-width: 30rem;
     padding-top: $space-10;
     border-top: 1px solid $color-border;
 
     @include mobile {
       padding-top: $space-8;
     }
+  }
+
+  &__empty-copy {
+    max-width: 30rem;
   }
 
   &__empty-title {

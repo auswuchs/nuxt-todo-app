@@ -2,11 +2,13 @@
 type Props = {
   label: string
   variant?: 'ghost' | 'danger'
+  size?: 'sm' | 'md'
   disabled?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   variant: 'ghost',
+  size: 'md',
   disabled: false,
 })
 </script>
@@ -15,7 +17,7 @@ withDefaults(defineProps<Props>(), {
   <button
     type="button"
     class="app-icon-button"
-    :class="`app-icon-button--${variant}`"
+    :class="[`app-icon-button--${variant}`, `app-icon-button--${size}`]"
     :aria-label="label"
     :title="label"
     :disabled="disabled"
@@ -65,6 +67,11 @@ withDefaults(defineProps<Props>(), {
     color: $color-danger;
     background: $color-danger-soft;
     border-color: transparent;
+  }
+
+  &--sm {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   @include mobile {

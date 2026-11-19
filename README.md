@@ -31,7 +31,7 @@ docker compose up
 NUXT_APP_BASE_URL=/nuxt-todo-app/ pnpm generate:pages
 ```
 
-Workflow `.github/workflows/deploy.yml` публикует `.output/public` при пуше в `main`. В настройках репозитория нужно включить **Settings → Pages → Build and deployment → Source: GitHub Actions**. Адрес: https://auswuchs.github.io/nuxt-todo-app/.
+Workflow `.github/workflows/deploy.yml` публикует `.output/public` при пуше в `main` и пытается включить Pages автоматически. Если GitHub-токену не хватит прав, включите **Settings → Pages → Build and deployment → Source: GitHub Actions** и перезапустите workflow. Адрес: https://auswuchs.github.io/nuxt-todo-app/.
 
 ## Возможности
 

@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+.data
+.git
+.gitignore
+openspec
+tests
+coverage
+.playwright-cli
+*.log
+.env
+.eslintcache
+.vscode

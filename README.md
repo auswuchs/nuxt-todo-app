@@ -1,6 +1,6 @@
 # Заметки
 
-SPA для заметок с пунктами Todo. Две страницы: список заметок `/` и редактор `/notes/[id]`. Заметки и черновик хранятся в `localStorage`, незавершённое редактирование восстанавливается после перезагрузки.
+[Открыть приложение](https://auswuchs.github.io/nuxt-todo-app/)
 
 Стек: Nuxt 4, Vue 3 Composition API, TypeScript strict, Pinia, Zod, SCSS, Vitest. Без UI-библиотек, библиотек undo/redo и persisted-state плагинов.
 

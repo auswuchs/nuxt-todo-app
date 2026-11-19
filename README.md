@@ -18,8 +18,20 @@ pnpm dev
 Через Docker:
 
 ```bash
-docker compose up --build
+docker compose up
 ```
+
+Первый запуск соберёт образ. Если меняли зависимости или `Dockerfile`, пересоберите его командой `docker compose up --build`.
+
+## GitHub Pages
+
+Статическая версия собирается командой:
+
+```bash
+NUXT_APP_BASE_URL=/nuxt-todo-app/ pnpm generate:pages
+```
+
+Workflow `.github/workflows/deploy.yml` публикует `.output/public` при пуше в `main`. В настройках репозитория нужно включить **Settings → Pages → Build and deployment → Source: GitHub Actions**. Адрес: https://auswuchs.github.io/nuxt-todo-app/.
 
 ## Возможности
 
@@ -112,7 +124,8 @@ app/
 ├── utils/                       общие утилиты без домена
 │   ├── debouncedWriter.ts       debounce с flush/cancel
 │   ├── id.ts                    createId на crypto.randomUUID
-│   └── note.ts                  cloneNote, normalizeTitle
+│   ├── note.ts                  cloneNote, normalizeTitle
+│   └── plural.ts                русские формы множественного числа
 ├── enums/Routes.ts              Routes.Home, Routes.NoteDetail(id)
 ├── modules/notes/               вертикальный срез домена
 │   ├── types.ts                 Note, TodoItem, версии схемы
@@ -125,10 +138,10 @@ app/
 │   │   ├── NoteEditSession.ts   createNoteEditSession: патчи и операции с пунктами
 │   │   └── NotesRepository.ts   загрузка, CRUD и debounce записи
 │   ├── composables/             useNotes, useNote
-│   └── components/              NoteCard, CreateNoteDialog, TodoItemRow, TodoComposer, DraftRecoveryDialog
+│   └── components/              NoteEntry, CreateNoteDialog, TodoItemRow, TodoComposer, DraftRecoveryDialog
 ├── components/
 │   ├── app/DialogHost.vue       глобальный контейнер модалок
-│   └── ui/                      AppModal, ConfirmDialog, AppButton
+│   └── ui/                      AppModal, ConfirmDialog, AppButton, AppIconButton
 ├── composables/useDialog.ts     generic dialog API
 └── pages/                       index.vue, notes/[id].vue
 ```
@@ -146,6 +159,8 @@ app/
 |---|---|
 | `pnpm dev` | dev-сервер Nuxt |
 | `pnpm build` | production-сборка |
+| `pnpm generate` | статическая сборка |
+| `pnpm generate:pages` | статическая сборка для GitHub Pages (`404.html`, `.nojekyll`) |
 | `pnpm preview` | preview собранного приложения |
 | `pnpm typecheck` | `vue-tsc --noEmit` |
 | `pnpm test` | unit-тесты Vitest |

@@ -72,12 +72,22 @@ export function createNoteEditSession(
     let patch: Patch | null = null
 
     if (commit.field === 'title') {
-      patch = { type: PatchType.Title, before: commit.before, after: commit.after }
+      patch = {
+        type: PatchType.Title,
+        before: commit.before,
+        after: commit.after,
+      }
     } else if (commit.field.startsWith(TODO_FIELD_PREFIX)) {
       const id = commit.field.slice(TODO_FIELD_PREFIX.length)
       const index = findTodoIndex(id)
+
       if (index !== -1) {
-        patch = { type: PatchType.TodoText, index, before: commit.before, after: commit.after }
+        patch = {
+          type: PatchType.TodoText,
+          index,
+          before: commit.before,
+          after: commit.after,
+        }
       }
     }
 
@@ -88,7 +98,11 @@ export function createNoteEditSession(
     if (disposed || value === current.title) return
 
     const before = current.title
-    applyImmediate({ type: PatchType.Title, before, after: value })
+    applyImmediate({
+      type: PatchType.Title,
+      before,
+      after: value,
+    })
     deferred.update('title', before, value)
   }
 
@@ -101,7 +115,12 @@ export function createNoteEditSession(
     const before = current.todos[index]!.text
     if (before === value) return
 
-    applyImmediate({ type: PatchType.TodoText, index, before, after: value })
+    applyImmediate({
+      type: PatchType.TodoText,
+      index,
+      before,
+      after: value,
+    })
     deferred.update(`${TODO_FIELD_PREFIX}${id}`, before, value)
   }
 
@@ -113,7 +132,13 @@ export function createNoteEditSession(
     if (index === -1) return false
 
     const before = current.todos[index]!.done
-    return commitAndApply({ type: PatchType.TodoToggle, index, before, after: !before })
+
+    return commitAndApply({
+      type: PatchType.TodoToggle,
+      index,
+      before,
+      after: !before,
+    })
   }
 
   function removeTodo(id: string): boolean {
@@ -138,7 +163,11 @@ export function createNoteEditSession(
 
     deferred.flush()
     const item = { id: createId(), text: normalized, done: false }
-    return commitAndApply({ type: PatchType.TodoAdd, index: current.todos.length, item })
+    return commitAndApply({
+      type: PatchType.TodoAdd,
+      index: current.todos.length,
+      item,
+    })
   }
 
   function undo(): boolean {

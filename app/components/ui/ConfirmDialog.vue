@@ -85,16 +85,16 @@ const confirmAutofocus = computed(() =>
 .confirm {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: $space-3;
 
   &__title {
-    font-size: 20px;
+    font-size: $text-lg;
     line-height: 1.25;
-    letter-spacing: -0.01em;
   }
 
   &__message {
-    font-size: 15px;
+    font-size: $text-base;
+    line-height: $line-snug;
     color: $color-text-soft;
   }
 
@@ -102,8 +102,8 @@ const confirmAutofocus = computed(() =>
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 8px;
+    gap: $space-3;
+    margin-top: $space-2;
 
     @include mobile {
       flex-direction: column-reverse;

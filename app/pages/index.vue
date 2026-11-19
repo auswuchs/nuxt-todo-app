@@ -3,109 +3,91 @@ import { useNotes } from '~/modules/notes/composables/useNotes'
 
 useHead({ title: 'Заметки' })
 
-const { notes, isEmpty, createNote, deleteNote } = useNotes()
+const { notes, isEmpty, countLabel, createNote, deleteNote } = useNotes()
 </script>
 
 <template>
   <div class="page-shell catalog">
-    <section class="catalog__hero">
+    <header class="catalog__header">
       <div class="catalog__heading">
-        <p class="catalog__eyebrow">Личное пространство</p>
-        <h1 class="page-title">Заметки</h1>
+        <h1 class="page-title">
+          Заметки
+        </h1>
         <p class="page-subtitle">
-          {{ isEmpty ? 'Пока пусто. Создайте первую заметку.' : `Всего заметок: ${notes.length}` }}
+          {{ isEmpty ? 'Личное пространство' : countLabel }}
         </p>
       </div>
+
       <AppButton
         class="catalog__create"
         @click="createNote"
       >
-        Создать заметку
+        <svg
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        >
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        Новая заметка
       </AppButton>
-    </section>
+    </header>
 
-    <section
+    <ul
       v-if="!isEmpty"
-      class="catalog__grid"
+      class="catalog__list"
       aria-label="Список заметок"
     >
-      <NoteCard
+      <NoteEntry
         v-for="note in notes"
         :key="note.id"
         :note="note"
         @remove="deleteNote(note)"
       />
-    </section>
+    </ul>
 
     <section
       v-else
       class="catalog__empty"
     >
-      <div
-        class="catalog__empty-icon"
-        aria-hidden="true"
-      >
-        <svg
-          viewBox="0 0 48 48"
-          width="48"
-          height="48"
-        >
-          <rect
-            x="8"
-            y="6"
-            width="32"
-            height="36"
-            rx="5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-          <path
-            d="M16 17h16M16 24h16M16 31h10"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-      </div>
-      <h2>Здесь появятся ваши заметки</h2>
-      <p>Каждая заметка — это название и список пунктов, которые можно отмечать выполненными.</p>
-      <AppButton @click="createNote">Создать первую заметку</AppButton>
+      <h2 class="catalog__empty-title">
+        Пока нет заметок
+      </h2>
+      <p class="catalog__empty-text">
+        Создайте первую — она появится здесь вместе со списком пунктов.
+      </p>
+      <AppButton @click="createNote">
+        Создать первую заметку
+      </AppButton>
     </section>
   </div>
 </template>
 
 <style scoped lang="scss">
 .catalog {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-
-  &__hero {
+  &__header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 20px;
+    gap: $space-6;
+    padding-bottom: $space-5;
 
     @include mobile {
       flex-direction: column;
       align-items: stretch;
+      gap: $space-5;
     }
   }
 
   &__heading {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-  }
-
-  &__eyebrow {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: $color-accent;
+    gap: $space-1;
   }
 
   &__create {
@@ -116,47 +98,43 @@ const { notes, isEmpty, createNote, deleteNote } = useNotes()
     }
   }
 
-  &__grid {
+  &__list {
     display: grid;
-    gap: 18px;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    row-gap: 0;
+    column-gap: $space-8;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    border-top: 1px solid $color-border;
 
     @include mobile {
+      column-gap: 0;
       grid-template-columns: 1fr;
     }
   }
 
   &__empty {
-    @include card;
+    max-width: 30rem;
+    padding-top: $space-10;
+    border-top: 1px solid $color-border;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    padding: 52px 28px;
-    text-align: center;
-
-    h2 {
-      font-size: 21px;
-      letter-spacing: -0.01em;
-    }
-
-    p {
-      max-width: 440px;
-      font-size: 15px;
-      color: $color-muted;
+    @include mobile {
+      padding-top: $space-8;
     }
   }
 
-  &__empty-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 76px;
-    height: 76px;
-    color: $color-accent;
-    background: $color-accent-soft;
-    border-radius: 50%;
+  &__empty-title {
+    font-size: $text-xl;
+    line-height: $line-tight;
+  }
+
+  &__empty-text {
+    margin-top: $space-2;
+    font-size: $text-base;
+    line-height: $line-snug;
+    color: $color-muted;
+  }
+
+  &__empty :deep(.app-button) {
+    margin-top: $space-5;
   }
 }
 </style>

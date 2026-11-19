@@ -9,6 +9,7 @@ import { clearDraftFor } from '~/modules/notes/services/DraftStorage'
 import { getBrowserStorage, NOTES_STORAGE_KEY } from '~/modules/notes/services/Storage'
 import { useNotesStore } from '~/modules/notes/store'
 import type { Note } from '~/modules/notes/types'
+import { pluralizeRu } from '~/utils/plural'
 
 export function useNotes() {
   const store = useNotesStore()
@@ -17,14 +18,14 @@ export function useNotes() {
 
   const notes = computed<Note[]>(() => store.notes)
   const isEmpty = computed(() => store.notes.length === 0)
+  const countLabel = computed(
+    () => pluralizeRu(store.notes.length, ['заметка', 'заметки', 'заметок']),
+  )
 
   function onStorage(event: StorageEvent) {
     if (event.key !== NOTES_STORAGE_KEY) return
     store.reloadFromStorage()
   }
-
-  onMounted(() => window.addEventListener('storage', onStorage))
-  onBeforeUnmount(() => window.removeEventListener('storage', onStorage))
 
   async function createNote() {
     const { data, ok } = await dialog.reveal<string>(CreateNoteDialog)
@@ -50,5 +51,8 @@ export function useNotes() {
     clearDraftFor(note.id, storage)
   }
 
-  return { notes, isEmpty, createNote, deleteNote }
+  onMounted(() => window.addEventListener('storage', onStorage))
+  onBeforeUnmount(() => window.removeEventListener('storage', onStorage))
+
+  return { notes, isEmpty, countLabel, createNote, deleteNote }
 }

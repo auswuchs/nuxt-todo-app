@@ -7,12 +7,14 @@
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
+    "generate": "nuxt generate",
+    "generate:pages": "nuxt generate && node scripts/prepare-pages.mjs",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt prepare && vue-tsc --noEmit -p .nuxt/tsconfig.app.json",
     "test": "vitest run",
-    "lint:styles": "stylelint \"**/*.{vue,scss,css}\" --fix",
-    "lint:styles:check": "stylelint \"**/*.{vue,scss,css}\"",
+    "lint:styles": "stylelint \"app/**/*.{vue,scss,css}\" --fix",
+    "lint:styles:check": "stylelint \"app/**/*.{vue,scss,css}\"",
     "lint": "eslint . --fix --cache",
     "lint:check": "eslint . --cache"
   },

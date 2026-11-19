@@ -145,6 +145,7 @@ watch(
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown, true)
+
   const current = document.activeElement
   const focusWasInside = panel.value?.contains(current) ?? false
   if (props.restoreFocus && opener && document.contains(opener) && focusWasInside) {
@@ -183,17 +184,16 @@ onBeforeUnmount(() => {
 .app-modal {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: $z-modal;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background: rgb(24 22 19 / 50%);
-  backdrop-filter: blur(3px);
-  animation: modal-fade $transition-card;
+  padding: $space-6;
+  background: $color-overlay;
+  animation: modal-fade $transition-modal;
 
   @include mobile {
-    padding: 16px;
+    padding: $space-4;
   }
 
   &--inactive {
@@ -202,22 +202,22 @@ onBeforeUnmount(() => {
 
   &--closing {
     pointer-events: none;
-    animation: modal-fade-out $transition-card forwards;
+    animation: modal-fade-out $transition-modal forwards;
 
     .app-modal__panel {
-      animation: modal-fall $transition-card forwards;
+      animation: modal-fall $transition-modal forwards;
     }
   }
 
   &__panel {
     width: 100%;
-    max-width: 520px;
-    max-height: calc(100vh - 48px);
-    padding: 24px;
+    max-width: 32.5rem;
+    max-height: calc(100vh - 3rem);
+    padding: $space-6;
     overflow-y: auto;
     background: $color-surface;
     border: 1px solid $color-border;
-    border-radius: $radius-lg;
+    border-radius: $radius-xl;
     box-shadow: $shadow-md;
     animation: modal-rise $transition-modal;
 
@@ -226,12 +226,12 @@ onBeforeUnmount(() => {
     }
 
     @include mobile {
-      max-height: calc(100vh - 32px);
-      padding: 20px 18px;
+      max-height: calc(100vh - 2rem);
+      padding: $space-5 $space-4;
     }
 
     &--sm {
-      max-width: 440px;
+      max-width: 27.5rem;
     }
   }
 }
@@ -264,14 +264,14 @@ onBeforeUnmount(() => {
 
   to {
     opacity: 0;
-    transform: translateY(6px) scale(0.985);
+    transform: translateY(0.375rem) scale(0.985);
   }
 }
 
 @keyframes modal-rise {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.985);
+    transform: translateY(0.5rem) scale(0.985);
   }
 
   to {

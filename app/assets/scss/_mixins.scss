@@ -6,11 +6,15 @@
   }
 }
 
-@mixin card {
+@mixin surface {
   background: $color-surface;
   border: 1px solid $color-border;
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
+}
+
+@mixin card {
+  @include surface;
 }
 
 @mixin hover {
@@ -18,4 +22,9 @@
   &:focus-within {
     @content;
   }
+}
+
+@mixin focus-ring {
+  outline: 2px solid $color-focus;
+  outline-offset: 2px;
 }

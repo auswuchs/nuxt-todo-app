@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
 const appDir = fileURLToPath(new URL('./app', import.meta.url))
+const baseURL = process.env.NUXT_APP_BASE_URL || '/'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
@@ -27,6 +28,7 @@ export default defineNuxtConfig({
     strict: true,
   },
   app: {
+    baseURL,
     head: {
       htmlAttrs: { lang: 'ru' },
       title: 'Заметки',

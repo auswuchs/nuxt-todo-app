@@ -105,19 +105,18 @@ async function requestCancel() {
 .create-note {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: $space-4;
 
   &__title {
-    font-size: 20px;
+    font-size: $text-lg;
     line-height: 1.25;
-    letter-spacing: -0.01em;
   }
 
   &__actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 4px;
+    gap: $space-3;
+    margin-top: $space-1;
 
     @include mobile {
       flex-direction: column-reverse;

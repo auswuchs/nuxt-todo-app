@@ -99,7 +99,8 @@ export function useNote(noteId: Ref<string>) {
   }
 
   function onTitleInput(event: Event) {
-    session.value?.setTitle((event.target as HTMLInputElement).value)
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement
+    session.value?.setTitle(target.value.replace(/[\r\n]+/g, ' '))
   }
 
   function onTitleBlur() {
@@ -107,7 +108,7 @@ export function useNote(noteId: Ref<string>) {
   }
 
   function onTodoTextInput(payload: { id: string, value: string }) {
-    session.value?.setTodoText(payload.id, payload.value)
+    session.value?.setTodoText(payload.id, payload.value.replace(/[\r\n]+/g, ' '))
   }
 
   function toggleTodo(id: string) {

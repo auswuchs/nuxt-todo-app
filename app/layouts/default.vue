@@ -55,35 +55,42 @@ import { Routes } from '~/enums/Routes'
 .app-header {
   position: sticky;
   top: 0;
-  z-index: 10;
-  background: rgb(243 241 236 / 86%);
-  border-bottom: 1px solid rgb(226 221 212 / 80%);
-  backdrop-filter: blur(10px);
+  z-index: $z-header;
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
 
   &__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: $space-4;
     width: 100%;
-    max-width: 1040px;
+    max-width: $page-max;
+    height: $header-height;
     margin: 0 auto;
-    padding: 14px 24px;
+    padding: 0 $space-6;
 
     @include mobile {
-      padding: 12px 16px;
+      padding: 0 $space-4;
     }
   }
 
   &__brand {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: $space-3;
+    min-height: 2.75rem;
     color: $color-text;
 
     &:hover {
       text-decoration: none;
       color: $color-text;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+
+      border-radius: $radius-sm;
     }
   }
 
@@ -91,27 +98,24 @@ import { Routes } from '~/enums/Routes'
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    color: #fff;
+    width: 2rem;
+    height: 2rem;
+    color: $color-on-accent;
     background: $color-accent;
-    border-radius: 9px;
+    border-radius: 0.625rem;
     box-shadow: $shadow-accent;
+
+    :deep(svg) {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
   }
 
   &__name {
-    font-size: 17px;
+    font-family: $font-ui;
+    font-size: 1.125rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  &__hint {
-    font-size: 13px;
-    color: $color-muted;
-
-    @include mobile {
-      display: none;
-    }
+    letter-spacing: -0.02em;
   }
 }
 

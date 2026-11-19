@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
 import type { TodoItem } from '~/modules/notes/types'
 
 type Props = {
@@ -12,9 +14,32 @@ type Emits = {
   textBlur: []
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
+
+const textEl = ref<HTMLTextAreaElement | null>(null)
+
+function resizeText() {
+  const element = textEl.value
+  if (!element) return
+  element.style.height = 'auto'
+  element.style.height = `${element.scrollHeight}px`
+}
+
+watch(
+  () => props.todo.text,
+  () => nextTick(resizeText),
+)
+
+onMounted(() => {
+  resizeText()
+  window.addEventListener('resize', resizeText)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeText)
+})
 </script>
 
 <template>
@@ -23,85 +48,83 @@ const emit = defineEmits<Emits>()
     :class="{ 'todo-row--done': todo.done }"
   >
     <input
-      class="todo-row__checkbox"
+      class="todo-check todo-row__checkbox"
       type="checkbox"
       :checked="todo.done"
       :aria-label="todo.done ? 'Снять отметку о выполнении' : 'Отметить выполненным'"
       @change="emit('toggle', todo.id)"
     />
 
-    <input
+    <textarea
+      ref="textEl"
       class="todo-row__text"
-      type="text"
+      rows="1"
       :value="todo.text"
       aria-label="Текст пункта"
       @input="emit('textInput', {
         id: todo.id,
-        value: ($event.target as HTMLInputElement).value
+        value: ($event.target as HTMLTextAreaElement).value
       })"
       @blur="emit('textBlur')"
-      @keydown.enter.prevent="($event.target as HTMLInputElement).blur()"
+      @keydown.enter.prevent="($event.target as HTMLTextAreaElement).blur()"
     />
 
-    <button
-      type="button"
+    <AppIconButton
       class="todo-row__remove"
-      aria-label="Удалить пункт"
+      label="Удалить пункт"
+      variant="danger"
       @click="emit('remove', todo.id)"
     >
       <svg
         viewBox="0 0 20 20"
-        width="16"
-        height="16"
-        aria-hidden="true"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
       >
-        <path
-          d="M6 6l8 8M14 6l-8 8"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-        />
+        <path d="M6 6l8 8M14 6l-8 8" />
       </svg>
-    </button>
+    </AppIconButton>
   </li>
 </template>
 
 <style scoped lang="scss">
 .todo-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid transparent;
-  border-radius: $radius-sm;
-  transition: background-color $transition-fast, border-color $transition-fast;
+  align-items: flex-start;
+  gap: $space-3;
+  margin-inline: -$space-2;
+  padding: $space-2;
+  border-radius: $radius-md;
+  transition: background-color $transition-fast;
 
-  @include hover {
+  &:hover,
+  &:focus-within {
     background: $color-surface-muted;
-    border-color: $color-border;
-  }
-
-  &--done &__text {
-    text-decoration: line-through;
-    color: $color-muted;
   }
 
   &__checkbox {
     flex: none;
-    width: 18px;
-    height: 18px;
-    accent-color: $color-accent;
-    cursor: pointer;
+    margin-top: 0.4rem;
   }
 
   &__text {
+    display: block;
     flex: 1;
     min-width: 0;
-    padding: 6px 8px;
+    min-height: 2.25rem;
+    padding: 0.375rem 0.5rem;
+    overflow: hidden;
+    line-height: 1.45;
+    color: $color-text;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: $radius-sm;
+    transition:
+      background-color $transition-fast,
+      border-color $transition-fast,
+      box-shadow $transition-fast;
+    resize: none;
 
     &:hover {
       border-color: $color-border;
@@ -115,20 +138,29 @@ const emit = defineEmits<Emits>()
     }
   }
 
-  &__remove {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
+  &--done &__text {
+    text-decoration: line-through;
     color: $color-muted;
-    border-radius: 6px;
-    transition: background-color $transition-fast, color $transition-fast;
+    text-decoration-thickness: 1px;
+  }
 
-    &:hover {
-      color: $color-danger;
-      background: $color-danger-soft;
+  &__remove {
+    margin-top: 0.0625rem;
+    opacity: 0.55;
+    transition: opacity $transition-fast;
+  }
+
+  &:hover &__remove,
+  &:focus-within &__remove {
+    opacity: 1;
+  }
+
+  @include mobile {
+    margin-inline: 0;
+    padding-inline: 0;
+
+    &__remove {
+      opacity: 1;
     }
   }
 }

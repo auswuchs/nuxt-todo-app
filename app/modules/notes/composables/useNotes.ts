@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 
 import { navigateTo } from '#imports'
 import ConfirmDialog from '~/components/ui/ConfirmDialog.vue'
@@ -6,7 +6,7 @@ import { useDialog } from '~/composables/useDialog'
 import { Routes } from '~/enums/Routes'
 import CreateNoteDialog from '~/modules/notes/components/CreateNoteDialog.vue'
 import { clearDraftFor } from '~/modules/notes/services/DraftStorage'
-import { getBrowserStorage } from '~/modules/notes/services/Storage'
+import { getBrowserStorage, NOTES_STORAGE_KEY } from '~/modules/notes/services/Storage'
 import { useNotesStore } from '~/modules/notes/store'
 import type { Note } from '~/modules/notes/types'
 
@@ -17,6 +17,14 @@ export function useNotes() {
 
   const notes = computed<Note[]>(() => store.notes)
   const isEmpty = computed(() => store.notes.length === 0)
+
+  function onStorage(event: StorageEvent) {
+    if (event.key !== NOTES_STORAGE_KEY) return
+    store.reloadFromStorage()
+  }
+
+  onMounted(() => window.addEventListener('storage', onStorage))
+  onBeforeUnmount(() => window.removeEventListener('storage', onStorage))
 
   async function createNote() {
     const { data, ok } = await dialog.reveal<string>(CreateNoteDialog)

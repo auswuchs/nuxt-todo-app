@@ -16,6 +16,12 @@ import { cloneNote, normalizeTitle } from '~/utils/note'
 const DRAFT_WRITE_DEBOUNCE_MS = 500
 const SAVED_FLASH_MS = 2200
 
+function isTextEntry(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false
+  if (target.isContentEditable) return true
+  return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+}
+
 export function useNote(noteId: Ref<string>) {
   const notes = useNotesStore()
   const dialog = useDialog()
@@ -27,6 +33,7 @@ export function useNote(noteId: Ref<string>) {
   const notFound = ref(false)
   const hasChanges = ref(false)
   const savedFlash = ref(false)
+  const remoteChanged = ref(false)
   const canUndo = ref(false)
   const canRedo = ref(false)
 
@@ -62,6 +69,19 @@ export function useNote(noteId: Ref<string>) {
     syncHistoryFlags()
   }
 
+  function reconcileRemote(remote: Note) {
+    if (remote.updatedAt === note.value?.updatedAt) return
+
+    if (hasChanges.value) {
+      remoteChanged.value = true
+      return
+    }
+
+    startSession(cloneNote(remote))
+    hasChanges.value = false
+    remoteChanged.value = false
+  }
+
   function discardSession() {
     draftAllowed = false
     draftWriter.cancel()
@@ -69,6 +89,7 @@ export function useNote(noteId: Ref<string>) {
     session.value?.dispose()
     session.value = null
     hasChanges.value = false
+    remoteChanged.value = false
     canUndo.value = false
     canRedo.value = false
   }
@@ -139,6 +160,7 @@ export function useNote(noteId: Ref<string>) {
     startSession(saved)
     clearDraftFor(noteId.value, storage)
     hasChanges.value = false
+    remoteChanged.value = false
     showSavedFlash()
   }
 
@@ -191,12 +213,6 @@ export function useNote(noteId: Ref<string>) {
     await navigateTo(Routes.Home)
   }
 
-  function isTextEntry(target: EventTarget | null) {
-    if (!(target instanceof HTMLElement)) return false
-    if (target.isContentEditable) return true
-    return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
-  }
-
   function onHotkey(event: KeyboardEvent) {
     if (!(event.ctrlKey || event.metaKey) || event.altKey) return
     if (event.key.toLowerCase() !== 'z') return
@@ -216,13 +232,50 @@ export function useNote(noteId: Ref<string>) {
     }
   }
 
+  function applyRemoteNote() {
+    if (!ready.value || notFound.value || deletedNoticeShown || !note.value) return
+
+    const remote = notes.findNote(noteId.value)
+    if (!remote) {
+      deletedNoticeShown = true
+      void showDeletedNotice()
+      return
+    }
+
+    reconcileRemote(remote)
+  }
+
+  function loadRemoteVersion() {
+    const remote = notes.findNote(noteId.value)
+    if (!remote) {
+      deletedNoticeShown = true
+      void showDeletedNotice()
+      return
+    }
+
+    draftWriter.cancel()
+    clearDraftFor(noteId.value, storage)
+    startSession(cloneNote(remote))
+    hasChanges.value = false
+    remoteChanged.value = false
+  }
+
   function onStorage(event: StorageEvent) {
     if (event.key !== NOTES_STORAGE_KEY) return
     notes.reloadFromStorage()
-    if (!ready.value || notFound.value || deletedNoticeShown) return
-    if (!notes.findNote(noteId.value)) {
-      deletedNoticeShown = true
-      void showDeletedNotice()
+    applyRemoteNote()
+  }
+
+  async function offerDraftRecovery(draft: Note) {
+    const { data, ok } = await dialog.reveal<DraftRecoveryChoice>(DraftRecoveryDialog)
+    if (disposed || !ok) return
+
+    // Dismissal keeps the only draft copy; only explicit discard removes it.
+    if (data === 'discard') {
+      clearDraftFor(noteId.value, storage)
+    } else if (data === 'restore') {
+      startSession(cloneNote(draft))
+      hasChanges.value = true
     }
   }
 
@@ -243,27 +296,18 @@ export function useNote(noteId: Ref<string>) {
     startSession(cloneNote(saved))
     const draft = readDraftFor(noteId.value, storage)
 
-    if (draft) {
-      const { data, ok } = await dialog.reveal<DraftRecoveryChoice>(DraftRecoveryDialog)
-      if (disposed) return
-
-      // Escape, backdrop and navigation dismiss must not delete the only draft copy.
-      if (ok) {
-        if (data === 'discard') {
-          clearDraftFor(noteId.value, storage)
-        } else if (data === 'restore') {
-          startSession(cloneNote(draft))
-          hasChanges.value = true
-        }
-      }
-    }
+    if (draft) await offerDraftRecovery(draft)
 
     if (disposed) return
-    if (!notes.findNote(noteId.value)) {
+
+    const latest = notes.findNote(noteId.value)
+    if (!latest) {
       deletedNoticeShown = true
       await showDeletedNotice()
       return
     }
+
+    reconcileRemote(latest)
     ready.value = true
   })
 
@@ -298,6 +342,7 @@ export function useNote(noteId: Ref<string>) {
     canUndo,
     canRedo,
     titleEmpty,
+    remoteChanged,
     title: {
       onInput: onTitleInput,
       onBlur: onTitleBlur,
@@ -314,7 +359,8 @@ export function useNote(noteId: Ref<string>) {
       save,
       cancel: cancelEditing,
       deleteNote,
-      flush: flushPending,
+      flushPending,
+      loadRemoteVersion,
     },
   }
 }

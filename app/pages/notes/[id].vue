@@ -16,6 +16,7 @@ const {
   canUndo,
   canRedo,
   titleEmpty,
+  remoteChanged,
   title,
   todos,
   actions,
@@ -121,6 +122,23 @@ useHead(() => ({
         </div>
       </div>
 
+      <div
+        v-if="remoteChanged"
+        class="editor-remote"
+        role="status"
+      >
+        <span class="editor-remote__text">
+          Заметка изменена в другой вкладке. Загрузить версию? Несохранённые изменения будут потеряны.
+        </span>
+        <AppButton
+          variant="secondary"
+          size="sm"
+          @click="actions.loadRemoteVersion"
+        >
+          Загрузить версию
+        </AppButton>
+      </div>
+
       <article class="editor">
         <label class="field editor__title-field">
           <span class="field__label">Название заметки</span>
@@ -160,7 +178,7 @@ useHead(() => ({
               @toggle="todos.toggle"
               @remove="todos.remove"
               @text-input="todos.onTextInput"
-              @text-blur="actions.flush"
+              @text-blur="actions.flushPending"
             />
           </ul>
 
@@ -198,6 +216,31 @@ useHead(() => ({
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+
+.editor-remote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  background: $color-accent-soft;
+  border: 1px solid rgb(63 91 217 / 22%);
+  border-radius: $radius-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+
+    :deep(.app-button) {
+      width: 100%;
+    }
+  }
+
+  &__text {
+    color: $color-text-soft;
+  }
 }
 
 .editor-loading {
